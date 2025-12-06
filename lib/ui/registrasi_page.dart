@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:tokokita/model/user.dart';
+import 'package:tokokita/service/app_store.dart';
 
 class RegistrasiPage extends StatefulWidget {
   const RegistrasiPage({Key? key}) : super(key: key);
@@ -127,23 +129,44 @@ class _RegistrasiPageState extends State<RegistrasiPage> {
   // ============================
   Widget _buttonRegistrasi() {
     return ElevatedButton(
-      child: const Text("Registrasi"),
-      onPressed: () {
-        var validate = _formKey.currentState!.validate();
-
-        if (validate) {
-          // proses registrasi
-          setState(() {
-            isLoading = true;
-          });
-
-          // contoh: kamu bisa panggil API di sini
-
-          setState(() {
-            isLoading = false;
-          });
-        }
-      },
+      child: isLoading
+          ? const CircularProgressIndicator(color: Colors.white)
+          : const Text("Registrasi"),
+      onPressed: isLoading ? null : _handleRegister,
     );
+  }
+
+  Future<void> _handleRegister() async {
+    final validate = _formKey.currentState!.validate();
+    if (!validate) return;
+
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      final user = User(
+        name: _namaTextboxController.text,
+        email: _emailTextboxController.text,
+        password: _passwordTextboxController.text,
+      );
+      await AppStore.instance.register(user);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Registrasi berhasil, silakan login')),
+      );
+      Navigator.pop(context);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString().replaceAll('Exception: ', ''))),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    }
   }
 }

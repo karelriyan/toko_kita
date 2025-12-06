@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:tokokita/service/app_store.dart';
+import 'package:tokokita/ui/produk_page.dart';
 import 'package:tokokita/ui/registrasi_page.dart';
 
 class LoginPage extends StatefulWidget {
@@ -85,20 +87,31 @@ class _LoginPageState extends State<LoginPage> {
       child: _isLoading
           ? const CircularProgressIndicator(color: Colors.white)
           : const Text('Login'),
-      onPressed: () {
-        if (_formKey.currentState!.validate()) {
-          setState(() {
-            _isLoading = true;
-          });
-
-          // TODO: proses login API di sini
-
-          setState(() {
-            _isLoading = false;
-          });
-        }
-      },
+      onPressed: _isLoading ? null : _handleLogin,
     );
+  }
+
+  Future<void> _handleLogin() async {
+    if (!_formKey.currentState!.validate()) return;
+    setState(() => _isLoading = true);
+    try {
+      await AppStore.instance
+          .login(_emailTextboxController.text, _passwordTextboxController.text);
+      if (!mounted) return;
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const ProdukPage()),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString().replaceAll('Exception: ', ''))),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
   }
 
   // ============================

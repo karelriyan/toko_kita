@@ -14,8 +14,8 @@ class _ProdukFormState extends State<ProdukForm> {
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
 
-  String judul = 'TAMBAH PRODUK KAREL';
-  String tombolSubmit = 'SIMPAN KAREL';
+  String judul = 'TAMBAH PRODUK';
+  String tombolSubmit = 'SIMPAN';
 
   final _kodeProdukTextboxController = TextEditingController();
   final _namaProdukTextboxController = TextEditingController();
@@ -38,7 +38,7 @@ class _ProdukFormState extends State<ProdukForm> {
   void _setUpdateState() {
     if (widget.produk != null) {
       judul = 'UBAH PRODUK';
-      tombolSubmit = 'UBAH KAREL';
+      tombolSubmit = 'UBAH';
       _kodeProdukTextboxController.text = widget.produk!.kodeProduk ?? '';
       _namaProdukTextboxController.text = widget.produk!.namaProduk ?? '';
       _hargaProdukTextboxController.text =

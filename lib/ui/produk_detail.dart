@@ -47,12 +47,12 @@ class _ProdukDetailState extends State<ProdukDetail> {
       mainAxisSize: MainAxisSize.min,
       children: [
         OutlinedButton(
-          child: const Text('EDIT KAREL'),
+          child: const Text('EDIT'),
           onPressed: _editProduk,
         ),
         const SizedBox(width: 8),
         OutlinedButton(
-          child: const Text('DELETE KAREL'),
+          child: const Text('DELETE'),
           onPressed: _confirmHapus,
         ),
       ],
@@ -79,14 +79,14 @@ class _ProdukDetailState extends State<ProdukDetail> {
       content: const Text('Yakin ingin menghapus data ini?'),
       actions: [
         OutlinedButton(
-          child: const Text('Ya Karel'),
+          child: const Text('Ya'),
           onPressed: () {
             Navigator.of(context).pop(); // close dialog
             Navigator.pop(context, {'action': 'delete', 'id': widget.produk.id});
           },
         ),
         OutlinedButton(
-          child: const Text('Batal Karel'),
+          child: const Text('Batal'),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ],

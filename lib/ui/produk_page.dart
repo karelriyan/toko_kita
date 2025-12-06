@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tokokita/model/produk.dart';
+import 'package:tokokita/service/app_store.dart';
+import 'package:tokokita/ui/login_page.dart';
 import 'package:tokokita/ui/produk_detail.dart';
 import 'package:tokokita/ui/produk_form.dart';
 
@@ -11,26 +13,13 @@ class ProdukPage extends StatefulWidget {
 }
 
 class _ProdukPageState extends State<ProdukPage> {
-  final List<Produk> _produks = [
-    Produk(
-      id: '1',
-      kodeProduk: 'A001',
-      namaProduk: 'Kamera',
-      hargaProduk: 5000000,
-    ),
-    Produk(
-      id: '2',
-      kodeProduk: 'A002',
-      namaProduk: 'Kulkas',
-      hargaProduk: 2500000,
-    ),
-    Produk(
-      id: '3',
-      kodeProduk: 'A003',
-      namaProduk: 'Mesin Cuci',
-      hargaProduk: 2000000,
-    ),
-  ];
+  List<Produk> _produks = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _refreshProduk();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,9 +40,9 @@ class _ProdukPageState extends State<ProdukPage> {
         child: ListView(
           children: [
             ListTile(
-              title: const Text('Logout KAREL'),
+              title: const Text('Logout'),
               trailing: const Icon(Icons.logout),
-              onTap: () => Navigator.pop(context),
+              onTap: _logout,
             ),
           ],
         ),
@@ -75,11 +64,8 @@ class _ProdukPageState extends State<ProdukPage> {
     );
 
     if (result != null) {
-      setState(() {
-        result.id =
-            result.id ?? DateTime.now().millisecondsSinceEpoch.toString();
-        _produks.add(result);
-      });
+      await AppStore.instance.addProduk(result);
+      _refreshProduk();
     }
   }
 
@@ -90,17 +76,30 @@ class _ProdukPageState extends State<ProdukPage> {
     );
 
     if (result is Produk) {
-      setState(() {
-        final index = _produks.indexWhere((p) => p.id == result.id);
-        if (index != -1) {
-          _produks[index] = result;
-        }
-      });
+      await AppStore.instance.updateProduk(result);
+      _refreshProduk();
     } else if (result is Map && result['action'] == 'delete') {
-      setState(() {
-        _produks.removeWhere((p) => p.id == result['id']);
-      });
+      final id = result['id'];
+      if (id != null) {
+        await AppStore.instance.deleteProduk(id.toString());
+        _refreshProduk();
+      }
     }
+  }
+
+  void _refreshProduk() {
+    setState(() {
+      _produks = List<Produk>.from(AppStore.instance.getProdukList());
+    });
+  }
+
+  void _logout() {
+    AppStore.instance.logout();
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => const LoginPage()),
+      (route) => false,
+    );
   }
 }
 
